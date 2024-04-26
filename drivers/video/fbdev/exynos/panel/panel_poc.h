@@ -310,7 +310,7 @@ struct poc_partition {
 	int need_preload:1;
 
 	/* result */
-	int preload_done:1;
+	unsigned int preload_done:1;
 	int chksum_ok:1;
 	int write_check;
 	bool cache[MAX_PARTITION_REGION];
