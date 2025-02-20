@@ -14,17 +14,15 @@
 int main(void)
 {
 	static int tbi_enabled = 0;
-	unsigned long tag = 0;
-	struct utsname *ptr;
+	struct utsname *ptr, *tagged_ptr;
 	int err;
 
 	if (prctl(PR_SET_TAGGED_ADDR_CTRL, PR_TAGGED_ADDR_ENABLE, 0, 0, 0) == 0)
 		tbi_enabled = 1;
 	ptr = (struct utsname *)malloc(sizeof(*ptr));
 	if (tbi_enabled)
-		tag = 0x42;
-	ptr = (struct utsname *)SET_TAG(ptr, tag);
-	err = uname(ptr);
+		tagged_ptr = (struct utsname *)SET_TAG(ptr, 0x42);
+	err = uname(tagged_ptr);
 	free(ptr);
 
 	return err;
