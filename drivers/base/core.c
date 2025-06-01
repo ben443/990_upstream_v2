@@ -1180,21 +1180,6 @@ static void device_links_purge(struct device *dev)
 	device_links_write_unlock();
 }
 
-static void fw_devlink_link_device(struct device *dev)
-{
-	int fw_ret;
-
-	device_link_add_missing_supplier_links();
-
-	if (fwnode_has_op(dev->fwnode, add_links)) {
-		fw_ret = fwnode_call_int_op(dev->fwnode, add_links, dev);
-		if (fw_ret == -ENODEV)
-			device_link_wait_for_mandatory_supplier(dev);
-		else if (fw_ret)
-			device_link_wait_for_optional_supplier(dev);
-	}
-}
-
 /* Device links support end. */
 
 int (*platform_notify)(struct device *dev) = NULL;
@@ -2395,7 +2380,7 @@ int device_add(struct device *dev)
 	struct device *parent;
 	struct kobject *kobj;
 	struct class_interface *class_intf;
-	int error = -EINVAL;
+	int error = -EINVAL, fw_ret;
 	struct kobject *glue_dir = NULL;
 	bool is_fwnode_dev = false;
 
@@ -2511,8 +2496,15 @@ int device_add(struct device *dev)
 	 * waiting consumers can link to it before the driver is bound to the
 	 * device and the driver sync_state callback is called for this device.
 	 */
-	if (is_fwnode_dev)
-		fw_devlink_link_device(dev);
+	device_link_add_missing_supplier_links();
+
+	if (is_fwnode_dev && fwnode_has_op(dev->fwnode, add_links)) {
+		fw_ret = fwnode_call_int_op(dev->fwnode, add_links, dev);
+		if (fw_ret == -ENODEV)
+			device_link_wait_for_mandatory_supplier(dev);
+		else if (fw_ret)
+			device_link_wait_for_optional_supplier(dev);
+	}
 
 	bus_probe_device(dev);
 	if (parent)
