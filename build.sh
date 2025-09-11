@@ -18,6 +18,7 @@ Options:
     -k, --ksu [y/N]        Include KernelSU
     -r, --recovery [y/N]   Compile kernel for an Android Recovery
     -d, --dtbs [y/N]	   Compile only DTBs
+	-D, --droidian [y/N]   Include droidian compatibility.
 EOF
 }
 
@@ -31,13 +32,17 @@ while [[ $# -gt 0 ]]; do
             KSU_OPTION="$2"
             shift 2
             ;;
+		--droidian|-D)
+            DROIDIAN_OPTION="$2"
+            shift 2
+            ;;
         --recovery|-r)
             RECOVERY_OPTION="$2"
             shift 2
             ;;
-        --dtbs|-d)
-            DTB_OPTION="$2"
-            shift 2
+        --dtbs|-d)          
+		    DTB_OPTION="$2"
+		    shift 2
             ;;
         *)\
             unset_flags
@@ -132,6 +137,11 @@ if [[ "$DTB_OPTION" == "y" ]]; then
 	DTBS=y
 fi
 
+if [[ "$DROIDIAN_OPTION" == "y" ]]; then
+    DROIDIAN=droidian.config
+fi
+
+
 rm -rf build/out/$MODEL
 mkdir -p build/out/$MODEL/zip/files
 mkdir -p build/out/$MODEL/zip/META-INF/com/google/android
@@ -157,7 +167,16 @@ else
     echo "Building DTBs using "$MODEL.config""
 fi
 echo "Generating configuration file..."
+
 echo "-----------------------------------------------"
+ "-----------------------------------------------"
+if [ -z "$DROIDIAN" ]; then
+    echo "Building kernel using "$DROIDIAN""
+else
+    echo "Building kernel using "$MODEL.config""
+fi
+
+echo "Generating configuration file..."
 make ${MAKE_ARGS} -j$CORES exynos9830_defconfig $MODEL.config $KSU $RECOVERY || abort
 
 if [ ! -z "$DTBS" ]; then
@@ -179,7 +198,7 @@ RAMDISK_OFFSET=0x01000000
 SECOND_OFFSET=0xF0000000
 TAGS_OFFSET=0x00000100
 BASE=0x10000000
-CMDLINE='androidboot.hardware=exynos990 loop.max_part=7'
+CMDLINE='console=tty0 splash rw androidboot.hardware=exynos990 loop.max_part=7'
 HASHTYPE=sha1
 HEADER_VERSION=2
 OS_PATCH_LEVEL=2025-08
