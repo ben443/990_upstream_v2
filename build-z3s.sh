@@ -78,7 +78,7 @@ O=out
 "
 
 # Define specific variables
-KERNEL_DEFCONFIG=extreme_"$MODEL"_defconfig
+KERNEL_DEFCONFIG=z3s_defconfig z3s.config
 case $MODEL in
 x1slte)
     BOARD=SRPSJ28B018KU
