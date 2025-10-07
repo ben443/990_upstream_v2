@@ -29,3 +29,5 @@ jobs:
             *.img
             *.bin
             *.tar.gz
+            *kernel
+            *Image
