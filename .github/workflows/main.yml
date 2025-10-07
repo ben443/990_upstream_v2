@@ -18,7 +18,7 @@ jobs:
       - name: Run build script
         run: |
           chmod +x build-droidian.sh
-          ./build-droidian.sh
+          ./build-droidian.sh -m z3s -k n -r n -d n
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
