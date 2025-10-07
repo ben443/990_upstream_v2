@@ -17,15 +17,14 @@ jobs:
 
       - name: Run build script
         run: |
-          chmod +x build-z3s.sh
-          ./build-z3s.sh -m z3s -k n
-
+          chmod +x build-droidian.sh
+          ./build-droidian.sh
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: kernel-build-output
           path: |
-            build/out/
+            build/out/*
             *.img
             *.bin
             *.tar.gz
